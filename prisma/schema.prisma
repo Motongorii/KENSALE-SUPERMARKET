@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String
+  role     String
+}
+
+model Customer {
+  id             Int      @id @default(autoincrement())
+  name           String
+  contacts       String
+  telephone      String
+  openingBalance Float?
+  sales          Sale[]
+}
+
+model Supplier {
+  id             Int       @id @default(autoincrement())
+  name           String
+  contacts       String
+  telephone      String
+  openingBalance Float?
+  purchases      Purchase[]
+}
+
+model Product {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String
+  buyingPrice  Float?
+  sellingPrice Float?
+  inStock      Int?
+  category     String
+  saleItems    SaleItem[]
+  purchaseItems PurchaseItem[]
+}
+
+model BankAccount {
+  id             Int      @id @default(autoincrement())
+  name           String
+  openingBalance Float
+}
+
+model Employee {
+  id            Int      @id @default(autoincrement())
+  name          String
+  grossSalary   Float
+  nhifDeduction Float
+  nssfDeduction Float
+}
+
+model Sale {
+  id         Int        @id @default(autoincrement())
+  date       DateTime   @default(now())
+  customerId Int
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  items      SaleItem[]
+  total      Float
+}
+
+model SaleItem {
+  id        Int     @id @default(autoincrement())
+  saleId    Int
+  sale      Sale    @relation(fields: [saleId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+model Purchase {
+  id         Int            @id @default(autoincrement())
+  date       DateTime       @default(now())
+  supplierId Int
+  supplier   Supplier       @relation(fields: [supplierId], references: [id])
+  items      PurchaseItem[]
+  total      Float
+}
+
+model PurchaseItem {
+  id         Int      @id @default(autoincrement())
+  purchaseId Int
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  price      Float
+}
